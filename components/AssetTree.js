@@ -1,28 +1,61 @@
-import React from "react";
+import React, { useCallback, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import TreeView from "@material-ui/lab/TreeView";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import AssetItem from "./AssetItem";
+import AssetDialog from "./AssetDialog";
 
 const useStyles = makeStyles({
-  root: {
-    height: 216,
-    flexGrow: 1,
+  treeView: {
     maxWidth: 400,
   },
 });
 
-export default function ControlledTreeView() {
+export default function AssetTree() {
   const classes = useStyles();
+  const [open, setOpen] = useState(false);
+  const [editingAsset, setEditingAsset] = useState(null);
+  const [siblingAssets, setSiblingAssets] = useState([]);
+  const [parentKey, setParentKey] = useState("");
+
+  const addAsset = useCallback((siblingAssets, parentKey) => {
+    setOpen(true);
+    setSiblingAssets(siblingAssets);
+    setParentKey(parentKey);
+  }, []);
+
+  const editAsset = useCallback((asset) => {
+    setOpen(true);
+    setEditingAsset(asset);
+  }, []);
+
+  const handleClose = () => {
+    setOpen(false);
+    setEditingAsset(null);
+  };
 
   return (
-    <TreeView
-      className={classes.root}
-      defaultCollapseIcon={<ExpandMoreIcon />}
-      defaultExpandIcon={<ChevronRightIcon />}
-    >
-      <AssetItem asset={{ name: "Assets" }} />
-    </TreeView>
+    <>
+      <AssetDialog
+        open={open}
+        onClose={handleClose}
+        editingAsset={editingAsset}
+        siblingAssets={siblingAssets}
+        parentKey={parentKey}
+      />
+      <TreeView
+        className={classes.treeView}
+        defaultExpanded={['']}
+        defaultCollapseIcon={<ExpandMoreIcon />}
+        defaultExpandIcon={<ChevronRightIcon />}
+      >
+        <AssetItem
+          asset={{ key: "", name: "Assets" }}
+          addAsset={addAsset}
+          editAsset={editAsset}
+        />
+      </TreeView>
+    </>
   );
 }
