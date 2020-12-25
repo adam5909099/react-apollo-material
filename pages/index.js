@@ -1,5 +1,5 @@
 import Head from "next/head";
-import AssetTree from "../containers/AssetTree";
+import AssetTree from "../components/AssetTree";
 
 export default function Home() {
   return (

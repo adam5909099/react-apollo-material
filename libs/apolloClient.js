@@ -7,7 +7,7 @@ function createApolloClient() {
   return new ApolloClient({
     ssrMode: typeof window === "undefined",
     link: new HttpLink({
-      uri: "https://spruik.us-west-2.aws.cloud.dgraph.io/graphql",
+      uri: "https://asset.us-west-2.aws.cloud.dgraph.io/graphql",
     }),
     cache: new InMemoryCache(),
   });
