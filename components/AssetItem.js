@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import TreeItem from "@material-ui/lab/TreeItem";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import IconButton from "@material-ui/core/IconButton";
@@ -10,8 +10,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import { getAllChildrenFilter, getDirectChildrenFilter } from "../utils";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
-export const GET_ASSETS = gql`
-  query getAssets($keyFilter: String!) {
+export const QUERY_ASSET = gql`
+  query queryAsset($keyFilter: String!) {
     queryAsset(filter: { key: { regexp: $keyFilter } }) {
       id
       name
@@ -21,8 +21,8 @@ export const GET_ASSETS = gql`
   }
 `;
 
-const DELETE_ASSETS = gql`
-  mutation DeleteAssets($keyFilter: String!) {
+const DELETE_ASSET = gql`
+  mutation deleteAsset($keyFilter: String!) {
     deleteAsset(filter: { key: { regexp: $keyFilter } }) {
       asset {
         id
@@ -53,10 +53,10 @@ const useStyles = makeStyles((theme) => ({
 
 export default function AssetItem({ asset, addAsset, editAsset }) {
   const classes = useStyles();
-  const { data } = useQuery(GET_ASSETS, {
+  const { data } = useQuery(QUERY_ASSET, {
     variables: { keyFilter: getDirectChildrenFilter(asset.key) },
   });
-  const [deleteAsset, { loading: deleting }] = useMutation(DELETE_ASSETS);
+  const [deleteAsset, { loading: deleting }] = useMutation(DELETE_ASSET);
 
   const childAssets = data?.queryAsset ?? [];
 
@@ -75,14 +75,14 @@ export default function AssetItem({ asset, addAsset, editAsset }) {
       variables: { keyFilter: getAllChildrenFilter(asset.key) },
       update(cache, { data }) {
         const previousData = cache.readQuery({
-          query: GET_ASSETS,
+          query: QUERY_ASSET,
           variables: {
             keyFilter: getDirectChildrenFilter(asset.key.slice(0, -2)),
           },
         });
 
         cache.writeQuery({
-          query: GET_ASSETS,
+          query: QUERY_ASSET,
           variables: {
             keyFilter: getDirectChildrenFilter(asset.key.slice(0, -2)),
           },
@@ -121,6 +121,10 @@ export default function AssetItem({ asset, addAsset, editAsset }) {
                     aria-label="edit"
                     size="small"
                     disabled={deleting}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      editAsset(asset);
+                    }}
                   >
                     <EditIcon />
                   </IconButton>

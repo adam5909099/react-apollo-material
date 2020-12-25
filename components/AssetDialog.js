@@ -11,8 +11,9 @@ import Typography from "@material-ui/core/Typography";
 import { useForm, Controller } from "react-hook-form";
 import TextField from "@material-ui/core/TextField";
 import { gql, useMutation } from "@apollo/client";
-import { GET_ASSETS } from "./AssetItem";
+import { QUERY_ASSET } from "./AssetItem";
 import { getDirectChildrenFilter } from "../utils";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 const ADD_ASSET = gql`
   mutation AddAsset($asset: AddAssetInput!) {
@@ -25,6 +26,10 @@ const ADD_ASSET = gql`
     }
   }
 `;
+
+// const UPDATE_ASSET = gql`
+
+// `
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -68,7 +73,7 @@ export default function AssetDialog({
   parentKey,
 }) {
   const classes = useStyles();
-  const { handleSubmit, control } = useForm();
+  const { handleSubmit, register, errors } = useForm();
   const [addAsset, { loading }] = useMutation(ADD_ASSET, {
     onCompleted: onClose,
   });
@@ -83,12 +88,12 @@ export default function AssetDialog({
       variables: { asset: { ...formData, key } },
       update(cache, { data }) {
         const previousData = cache.readQuery({
-          query: GET_ASSETS,
+          query: QUERY_ASSET,
           variables: { keyFilter: getDirectChildrenFilter(parentKey) },
         });
-        
+
         cache.writeQuery({
-          query: GET_ASSETS,
+          query: QUERY_ASSET,
           variables: { keyFilter: getDirectChildrenFilter(parentKey) },
           data: {
             queryAsset: [
@@ -105,7 +110,9 @@ export default function AssetDialog({
     <Dialog onClose={onClose} aria-labelledby="asset-item-dialog" open={open}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogTitle disableTypography className={classes.root}>
-          <Typography variant="h6">{editingAsset?.name ?? "New asset"}</Typography>
+          <Typography variant="h6">
+            {editingAsset?.name ?? "New asset"}
+          </Typography>
           <IconButton
             aria-label="close"
             className={classes.closeButton}
@@ -115,28 +122,34 @@ export default function AssetDialog({
           </IconButton>
         </DialogTitle>
         <DialogContent dividers className={classes.content}>
-          <Controller
-            as={TextField}
+          <TextField
+            inputRef={register({ required: true })}
+            name="name"
+            defaultValue={editingAsset?.name ?? ""}
             label="Name"
             variant="outlined"
-            name="name"
-            control={control}
-            defaultValue={editingAsset?.name ?? ""}
+            error={!!errors.name}
+            helperText={errors.name && "Name is required."}
           />
-          <Controller
-            as={TextField}
+          <TextField
+            inputRef={register}
+            name="description"
+            defaultValue={editingAsset?.name ?? ""}
             label="Description"
             variant="outlined"
-            name="description"
             multiline
             rows={4}
-            control={control}
-            defaultValue={editingAsset?.description ?? ""}
           />
         </DialogContent>
         <DialogActions>
           <Button type="submit" disabled={loading} autoFocus color="primary">
-            {editingAsset ? "Save" : "Add"}
+            {loading ? (
+              <CircularProgress size={24} />
+            ) : editingAsset ? (
+              "Save"
+            ) : (
+              "Add"
+            )}
           </Button>
         </DialogActions>
       </form>
