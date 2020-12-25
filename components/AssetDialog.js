@@ -174,7 +174,7 @@ export default function AssetDialog({
             inputRef={register({ required: true })}
             name="name"
             defaultValue={editingAsset?.name ?? ""}
-            label="Name"
+            label="Name *"
             variant="outlined"
             autoFocus
             error={!!errors.name}
