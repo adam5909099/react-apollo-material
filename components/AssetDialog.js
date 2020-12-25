@@ -45,22 +45,22 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function AssetItemDialog({ open, onClose, assetItem }) {
+export default function AssetDialog({ open, onClose, asset, parent }) {
   const classes = useStyles();
   const { handleSubmit, control } = useForm();
   const [addAsset, { loading }] = useMutation(ADD_ASSET, {
     onCompleted: onClose,
   });
 
-  const onSubmit = (formData) => {
-    addAsset({ variables: formData });
+  const onSubmit = (asset) => {
+    addAsset({ variables: { asset: { ...asset, parent: { id: parent.id } } } });
   };
 
   return (
     <Dialog onClose={onClose} aria-labelledby="asset-item-dialog" open={open}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogTitle disableTypography className={classes.root}>
-          <Typography variant="h6">{assetItem?.name ?? "New asset"}</Typography>
+          <Typography variant="h6">{asset?.name ?? "New asset"}</Typography>
           <IconButton
             aria-label="close"
             className={classes.closeButton}
@@ -76,7 +76,7 @@ export default function AssetItemDialog({ open, onClose, assetItem }) {
             variant="outlined"
             name="name"
             control={control}
-            defaultValue={assetItem?.name ?? ""}
+            defaultValue={asset?.name ?? ""}
           />
           <Controller
             as={TextField}
@@ -86,12 +86,12 @@ export default function AssetItemDialog({ open, onClose, assetItem }) {
             multiline
             rows={4}
             control={control}
-            defaultValue={assetItem?.description ?? ""}
+            defaultValue={asset?.description ?? ""}
           />
         </DialogContent>
         <DialogActions>
           <Button type="submit" disabled={loading} autoFocus color="primary">
-            {assetItem ? "Save" : "Add"}
+            {asset ? "Save" : "Add"}
           </Button>
         </DialogActions>
       </form>

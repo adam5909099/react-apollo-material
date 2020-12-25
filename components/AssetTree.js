@@ -22,7 +22,7 @@ export default function ControlledTreeView() {
       defaultCollapseIcon={<ExpandMoreIcon />}
       defaultExpandIcon={<ChevronRightIcon />}
     >
-      <AssetItem assetItem={{ name: "Assets" }} />
+      <AssetItem asset={{ name: "Assets" }} />
     </TreeView>
   );
 }

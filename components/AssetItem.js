@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import PropTypes from "prop-types";
 import TreeItem from "@material-ui/lab/TreeItem";
 import { gql, useQuery } from "@apollo/client";
 import IconButton from "@material-ui/core/IconButton";
@@ -8,11 +7,14 @@ import AddIcon from "@material-ui/icons/Add";
 import EditIcon from "@material-ui/icons/Edit";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
-import AssetItemDialog from "./AssetItemDialog";
+import AssetDialog from "./AssetDialog";
 
 export const GET_ASSET = gql`
   query GetAsset($id: ID!) {
     getAsset(id: $id) {
+      id
+      name
+      description
       children {
         id
         name
@@ -60,8 +62,8 @@ function MountSensor({ onMount }) {
   return null;
 }
 
-export default function AssetItem({ assetItem }) {
-  const { id } = assetItem;
+export default function AssetItem({ asset }) {
+  const { id } = asset;
   const [expanded, setExpanded] = useState(false);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -70,7 +72,7 @@ export default function AssetItem({ assetItem }) {
     variables: id ? { id } : {},
   });
 
-  const childItems = id
+  const childAssets = id
     ? data?.queryAsset?.children ?? []
     : data?.queryAsset ?? [];
 
@@ -80,7 +82,7 @@ export default function AssetItem({ assetItem }) {
         nodeId={id ?? ""}
         label={
           <div className={classes.labelRoot}>
-            <Typography variant="body1">{assetItem.name}</Typography>
+            <Typography variant="body1">{asset.name}</Typography>
             <div className={classes.buttonContainer}>
               <IconButton
                 aria-label="add"
@@ -102,17 +104,21 @@ export default function AssetItem({ assetItem }) {
           </div>
         }
       >
-        {childItems.length ? (
+        {childAssets.length ? (
           <>
             <MountSensor onMount={setExpanded} />
-            {expanded && childItems.map((item) => <AssetItem {...item} />)}
+            {expanded &&
+              childAssets.map((asset) => (
+                <AssetItem key={asset.id} asset={asset} />
+              ))}
           </>
         ) : null}
       </TreeItem>
-      <AssetItemDialog
+      <AssetDialog
         open={open}
         onClose={() => setOpen(false)}
-        assetItem={editing ? assetItem : null}
+        asset={editing ? asset : null}
+        parentId={id}
       />
     </>
   );
