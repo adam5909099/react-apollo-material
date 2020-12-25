@@ -28,6 +28,8 @@ export default function AssetTree() {
   const editAsset = useCallback((asset) => {
     setOpen(true);
     setEditingAsset(asset);
+    console.log(asset);
+    setParentKey(asset.key.slice(0, -2));
   }, []);
 
   const handleClose = () => {
@@ -46,7 +48,7 @@ export default function AssetTree() {
       />
       <TreeView
         className={classes.treeView}
-        defaultExpanded={['']}
+        defaultExpanded={[""]}
         defaultCollapseIcon={<ExpandMoreIcon />}
         defaultExpandIcon={<ChevronRightIcon />}
       >
