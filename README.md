@@ -1,4 +1,4 @@
-![image](https://user-images.githubusercontent.com/59410529/118438226-ff158880-b6b1-11eb-8743-d7993a638eb6.png)
+![image](https://user-images.githubusercontent.com/59410529/118438282-1785a300-b6b2-11eb-876c-a7ff704942c8.png)
 
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
